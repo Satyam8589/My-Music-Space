@@ -30,6 +30,10 @@ const userSchema = new mongoose.Schema({
         type: String,
         enum: ["local", "google"],
         default: "local"
+    },
+    preferredLanguages: {
+        type: [String],
+        default: []
     }
 }, {
     timestamps: true

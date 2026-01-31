@@ -32,3 +32,16 @@ export const getUserByGoogleId = async (googleId) => {
         throw error;
     }
 };
+export const updateUserPreferences = async (userId, languages) => {
+    const user = await User.findByIdAndUpdate(
+        userId,
+        { preferredLanguages: languages },
+        { new: true, runValidators: true }
+    ).select("-password");
+
+    if (!user) {
+        throw new ApiError(404, "User not found");
+    }
+
+    return user;
+};
