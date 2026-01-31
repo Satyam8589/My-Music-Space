@@ -1,17 +1,16 @@
 import { registerUser, loginUser } from "./auth.service.js";
 import { asyncHandler } from "../../utils/asyncHandler.js";
 import { generateAccessToken } from "../../utils/jwt.js";
+import { ApiResponse } from "../../utils/ApiResponse.js";
 
 export const registerUserController = asyncHandler(async (req, res) => {
     const { name, email, password } = req.body;
 
     const user = await registerUser({ name, email, password });
     
-    res.status(201).json({ 
-        success: true, 
-        message: "User registered successfully",
-        data: user 
-    });
+    return res.status(201).json(
+        new ApiResponse(201, "User registered successfully", user)
+    );
 });
 
 export const loginUserController = asyncHandler(async (req, res) => {
@@ -19,14 +18,12 @@ export const loginUserController = asyncHandler(async (req, res) => {
     
     const result = await loginUser({ email, password });
     
-    res.status(200).json({
-        success: true,
-        message: "Login successful",
-        data: {
+    return res.status(200).json(
+        new ApiResponse(200, "Login successful", {
             accessToken: result.accessToken,
             user: result.user
-        }
-    });
+        })
+    );
 });
 
 export const googleAuthCallback = asyncHandler(async (req, res) => {
@@ -40,10 +37,8 @@ export const googleAuthCallback = asyncHandler(async (req, res) => {
 
     // In a real app, you might redirect to the frontend with the token
     // For testing, we'll return it as JSON
-    res.status(200).json({
-        success: true,
-        message: "Google login successful",
-        data: {
+    return res.status(200).json(
+        new ApiResponse(200, "Google login successful", {
             accessToken,
             user: {
                 _id: user._id,
@@ -52,7 +47,8 @@ export const googleAuthCallback = asyncHandler(async (req, res) => {
                 picture: user.picture,
                 authProvider: user.authProvider,
             }
-        }
-    });
+        })
+    );
 });
+
 

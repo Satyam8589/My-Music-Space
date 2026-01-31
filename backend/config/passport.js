@@ -13,14 +13,12 @@ passport.use(
         },
         async (accessToken, refreshToken, profile, done) => {
             try {
-                // Check if user already exists in our db
                 let user = await User.findOne({ googleId: profile.id });
 
                 if (user) {
                     return done(null, user);
                 }
 
-                // If not, create a new user
                 user = await User.create({
                     googleId: profile.id,
                     name: profile.displayName,

@@ -4,8 +4,7 @@ import { asyncHandler } from "../utils/asyncHandler.js";
 dotenv.config();
 
 const connectDB = asyncHandler(async () => {
-    await mongoose.connect(process.env.MONGO_URI, {
-    });
+    await mongoose.connect(process.env.MONGO_URI);
     console.log("MongoDB connected");
 });
 
