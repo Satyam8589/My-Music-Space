@@ -40,7 +40,6 @@ export const addSongToMoodSpace = async (userId, spaceId, songData) => {
         throw new ApiError(404, "Mood space not found");
     }
 
-    // Check if song already exists in THIS space
     const songExists = space.songs.some(song => song.videoId === songData.videoId);
     if (songExists) {
         throw new ApiError(400, "Song already exists in this mood space");
@@ -82,6 +81,10 @@ export const updateSongModeInSpace = async (userId, spaceId, videoId, mode) => {
     }
 
     song.mode = mode;
-    await space.save();
-    return space;
+    const updatedSpace = await space.save();
+    
+    if(!updatedSpace){
+        throw new ApiError(500, "Failed to update song mode");
+    }
+    return updatedSpace;
 };

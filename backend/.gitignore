@@ -31,3 +31,9 @@ build/
 
 # Documentation
 doc/
+
+# gitignore
+.gitignore
+
+# testing
+tests/
