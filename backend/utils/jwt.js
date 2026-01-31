@@ -4,9 +4,9 @@ export const generateAccessToken = (payload) => {
     try {
         const token = jwt.sign(
             payload,
-            process.env.JWT_SECRET,
+            process.env.JWT_ACCESS_SECRET,
             { 
-                expiresIn: process.env.JWT_EXPIRES_IN || "1h"
+                expiresIn: process.env.JWT_ACCESS_EXPIRY || "15m"
             }
         );
         return token;
@@ -17,7 +17,7 @@ export const generateAccessToken = (payload) => {
 
 export const verifyAccessToken = (token) => {
     try {
-        const decoded = jwt.verify(token, process.env.JWT_SECRET);
+        const decoded = jwt.verify(token, process.env.JWT_ACCESS_SECRET);
         return decoded;
     } catch (error) {
         if (error.name === 'TokenExpiredError') {

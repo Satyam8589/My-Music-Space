@@ -31,3 +31,6 @@ build/
 
 # Documentation
 doc/
+
+# Tests
+tests/

@@ -1,29 +1,5 @@
 import mongoose from "mongoose";
 
-const musicSchema = new mongoose.Schema({
-    videoId: {
-        type: String,
-        required: true
-    },
-    title: {
-        type: String,
-        required: true
-    },
-    thumbnail: {
-        type: String,
-        required: true
-    },
-    mode: {
-        type: String,
-        enum: ["audio", "video"],
-        default: "audio"
-    },
-    addedAt: {
-        type: Date,
-        default: Date.now
-    }
-});
-
 const userSchema = new mongoose.Schema({
     name: {
         type: String,
@@ -39,10 +15,22 @@ const userSchema = new mongoose.Schema({
     },
     password: {
         type: String,
-        required: true,
+        required: false,  // Not required for Google OAuth users
         select: false
     },
-    musicSpace: [musicSchema]
+    googleId: {
+        type: String,
+        unique: true,
+        sparse: true  // Allows null values while maintaining uniqueness
+    },
+    picture: {
+        type: String  // Google profile picture URL
+    },
+    authProvider: {
+        type: String,
+        enum: ["local", "google"],
+        default: "local"
+    }
 }, {
     timestamps: true
 });
