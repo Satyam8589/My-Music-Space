@@ -37,9 +37,6 @@ passport.use(
     )
 );
 
-// We don't necessarily need session serialization if we are using JWT,
-// but Passport requires these methods if sessions are enabled.
-// However, since we'll use JWT tokens after Google login, we can keep it simple.
 passport.serializeUser((user, done) => {
     done(null, user.id);
 });
