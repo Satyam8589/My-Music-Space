@@ -35,8 +35,6 @@ export const googleAuthCallback = asyncHandler(async (req, res) => {
         email: user.email,
     });
 
-    // In a real app, you might redirect to the frontend with the token
-    // For testing, we'll return it as JSON
     return res.status(200).json(
         new ApiResponse(200, "Google login successful", {
             accessToken,
@@ -50,5 +48,4 @@ export const googleAuthCallback = asyncHandler(async (req, res) => {
         })
     );
 });
-
 

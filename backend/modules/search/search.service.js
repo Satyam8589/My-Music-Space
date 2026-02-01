@@ -42,6 +42,36 @@ export const getRecommendedSongs = async (userId) => {
         throw new ApiError(500, "Failed to fetch recommended songs");
     }
 };
+
+export const getSearchRecommendations = async (query) => {
+    try {
+        const response = await youtube.get("/search", {
+            params: {
+                part: "snippet",
+                maxResults: 50,
+                q: query,
+                type: "video",
+                videoCategoryId: "10",
+                order: "relevance"
+            }
+        });
+
+        const songs = response.data.items.map(item => ({
+            videoId: item.id.videoId,
+            title: item.snippet.title,
+            thumbnail: item.snippet.thumbnails.high?.url || item.snippet.thumbnails.default?.url,
+            channelTitle: item.snippet.channelTitle,
+            publishedAt: item.snippet.publishedAt
+        }));
+
+        return songs;
+
+    } catch (error) {
+        console.error("YouTube Recommended Error:", error.response?.data || error.message);
+        throw new ApiError(500, "Failed to fetch recommended songs");
+    }
+};
+
 export const getTop100Songs = async (regionCode = "IN") => {
     try {
         const commonParams = {

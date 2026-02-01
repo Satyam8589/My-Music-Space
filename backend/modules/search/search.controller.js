@@ -1,9 +1,18 @@
 import { asyncHandler } from "../../utils/asyncHandler.js";
 import { ApiResponse } from "../../utils/ApiResponse.js";
-import { getTop100Songs, searchSongs, getRecommendedSongs } from "./search.service.js";
+import { getTop100Songs, searchSongs, getRecommendedSongs, getSearchRecommendations } from "./search.service.js";
 
 export const getRecommendedSongsController = asyncHandler(async (req, res) => {
     const songs = await getRecommendedSongs(req.user.userId);
+    
+    return res.status(200).json(
+        new ApiResponse(200, "Recommended songs retrieved", songs)
+    );
+});
+
+export const getSearchRecommendationsController = asyncHandler(async (req, res) => {
+    const { query } = req.query;
+    const songs = await getSearchRecommendations(query);
     
     return res.status(200).json(
         new ApiResponse(200, "Recommended songs retrieved", songs)
