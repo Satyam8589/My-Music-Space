@@ -284,23 +284,6 @@ export default function Dashboard() {
     }
   }, [isAuthenticated, authLoading, router]);
 
-  // Show loading screen while checking authentication
-  if (authLoading) {
-    return (
-      <div className="min-h-screen bg-black flex items-center justify-center">
-        <div className="text-center space-y-4">
-          <div className="w-16 h-16 border-4 border-purple-500/20 border-t-purple-500 rounded-full animate-spin mx-auto" />
-          <p className="text-gray-400 font-medium">Loading...</p>
-        </div>
-      </div>
-    );
-  }
-
-  // Don't render dashboard if not authenticated
-  if (!isAuthenticated) {
-    return null;
-  }
-
   useEffect(() => {
     const handleMouseMove = (e) => {
       setMousePosition({
@@ -342,18 +325,22 @@ export default function Dashboard() {
     return `${mins}:${secs.toString().padStart(2, "0")}`;
   };
 
+  // Show loading screen while checking authentication
   if (authLoading) {
     return (
       <div className="min-h-screen bg-black flex items-center justify-center">
-        <div className="relative">
-          <div className="w-16 h-16 border-4 border-purple-500/20 border-t-purple-500 rounded-full animate-spin" />
-          <div className="absolute inset-0 bg-purple-500/20 blur-xl animate-pulse" />
+        <div className="text-center space-y-4">
+          <div className="w-16 h-16 border-4 border-purple-500/20 border-t-purple-500 rounded-full animate-spin mx-auto" />
+          <p className="text-gray-400 font-medium">Loading...</p>
         </div>
       </div>
     );
   }
 
-  if (!isAuthenticated) return null;
+  // Don't render dashboard if not authenticated
+  if (!isAuthenticated) {
+    return null;
+  }
 
   return (
     <div className="relative min-h-screen bg-black text-white font-sans overflow-hidden flex">
