@@ -21,6 +21,7 @@
     "test:auth": "cross-env NODE_OPTIONS=--experimental-vm-modules jest auth --runInBand",
     "test:utils": "cross-env NODE_OPTIONS=--experimental-vm-modules jest utils --runInBand",
     "test:model": "cross-env NODE_OPTIONS=--experimental-vm-modules jest model --runInBand",
+    "build": "npm install",
     "start": "node server.js",
     "dev": "nodemon server.js"
   },
