@@ -15,10 +15,6 @@ export default function Login() {
   const dispatch = useDispatch();
   const { isLoading, error, isAuthenticated, user } = useSelector((state) => state.auth);
   
-  if (isLoading) {
-    return <FullPageLoader message="Signing you in..." />;
-  }
-  
   const [formData, setFormData] = useState({
     email: "",
     password: "",
@@ -54,6 +50,10 @@ export default function Login() {
     window.addEventListener("mousemove", handleMouseMove);
     return () => window.removeEventListener("mousemove", handleMouseMove);
   }, []);
+
+  if (isLoading) {
+    return <FullPageLoader message="Signing you in..." />;
+  }
 
   const handleChange = (e) => {
     setFormData({

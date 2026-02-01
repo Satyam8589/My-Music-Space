@@ -15,10 +15,6 @@ export default function Register() {
   const dispatch = useDispatch();
   const { isLoading, error, isAuthenticated, user } = useSelector((state) => state.auth);
   
-  if (isLoading) {
-    return <FullPageLoader message="Creating your account..." />;
-  }
-  
   const [formData, setFormData] = useState({
     username: "",
     email: "",
@@ -56,6 +52,10 @@ export default function Register() {
     window.addEventListener("mousemove", handleMouseMove);
     return () => window.removeEventListener("mousemove", handleMouseMove);
   }, []);
+
+  if (isLoading) {
+    return <FullPageLoader message="Creating your account..." />;
+  }
 
   const handleChange = (e) => {
     const { name, value } = e.target;
