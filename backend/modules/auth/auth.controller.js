@@ -85,7 +85,11 @@ export const googleAuthCallback = asyncHandler(async (req, res) => {
 
     const { accessToken, refreshToken } = await generateAccessAndRefreshTokens(user._id);
     
-    const frontendURL = process.env.FRONTEND_URL || "http://localhost:3001";
+    let frontendURL = process.env.FRONTEND_URL || process.env.CORS_ORIGIN || "http://localhost:3000";
+    // Remove trailing slash if present
+    if (frontendURL.endsWith('/')) {
+        frontendURL = frontendURL.slice(0, -1);
+    }
     
     // Set cookie and redirect
     res.cookie("refreshToken", refreshToken, cookieOptions);
