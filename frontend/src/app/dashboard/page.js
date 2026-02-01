@@ -277,7 +277,9 @@ export default function Dashboard() {
   const [isLoadingRecommended, setIsLoadingRecommended] = useState(true);
 
   useEffect(() => {
+    console.log('Dashboard - Auth state:', { isAuthenticated, authLoading, user });
     if (!authLoading && !isAuthenticated) {
+      console.log('Not authenticated, redirecting to login...');
       router.push("/login");
     }
   }, [isAuthenticated, authLoading, router]);

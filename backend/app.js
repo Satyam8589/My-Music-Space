@@ -17,8 +17,25 @@ const __dirname = path.dirname(fileURLToPath(import.meta.url));
 
 const app = express();
 
+// CORS configuration - normalize origins by removing trailing slashes
+const corsOrigins = (process.env.CORS_ORIGIN || "http://localhost:3001")
+    .split(',')
+    .map(origin => origin.trim().replace(/\/$/, '')); // Remove trailing slash
+
 app.use(cors({ 
-    origin: process.env.CORS_ORIGIN || "http://localhost:3001",
+    origin: function (origin, callback) {
+        // Allow requests with no origin (like mobile apps or curl requests)
+        if (!origin) return callback(null, true);
+        
+        // Normalize the incoming origin by removing trailing slash
+        const normalizedOrigin = origin.replace(/\/$/, '');
+        
+        if (corsOrigins.includes(normalizedOrigin)) {
+            callback(null, true);
+        } else {
+            callback(new Error('Not allowed by CORS'));
+        }
+    },
     credentials: true 
 }));
 

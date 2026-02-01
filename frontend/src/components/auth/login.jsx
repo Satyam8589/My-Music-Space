@@ -31,7 +31,9 @@ export default function Login() {
   }, [searchParams, dispatch]);
 
   useEffect(() => {
+    console.log('Login page - Auth state:', { isAuthenticated, user, isLoading });
     if (isAuthenticated && user) {
+      console.log('Redirecting to dashboard...');
       router.push("/dashboard");
     }
   }, [isAuthenticated, user, router]);
@@ -57,7 +59,19 @@ export default function Login() {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    dispatch(loginAction(formData));
+    try {
+      // Dispatch login action and wait for it to complete
+      const result = await dispatch(loginAction(formData)).unwrap();
+      
+      // If login successful, fetch user profile
+      if (result?.accessToken) {
+        await dispatch(getUserProfileAction()).unwrap();
+        // Redirect will happen via the useEffect below
+      }
+    } catch (error) {
+      console.error('Login failed:', error);
+      // Error is already handled by the reducer
+    }
   };
 
   const handleGoogleLogin = () => {

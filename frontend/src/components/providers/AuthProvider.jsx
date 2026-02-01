@@ -18,8 +18,12 @@ export default function AuthProvider({ children }) {
         try {
           await dispatch(getUserProfileAction()).unwrap();
         } catch (error) {
-          // If profile fetch fails, clear token and stop loading
-          localStorage.removeItem('token');
+          console.error('Failed to fetch user profile:', error);
+          // Only clear token if it's an authentication error (401)
+          // Don't clear on network errors or other temporary issues
+          if (error?.includes('401') || error?.includes('Unauthorized') || error?.includes('Invalid token')) {
+            localStorage.removeItem('token');
+          }
           dispatch(setLoading(false));
         }
       } else {
