@@ -194,7 +194,7 @@ export default function Home() {
             </button>
             
             <button
-              onClick={() => router.push("/explore")}
+              onClick={() => router.push("/login")}
               className="group relative px-10 py-5 bg-white/5 backdrop-blur-xl border-2 border-white/20 rounded-2xl font-bold text-lg hover:bg-white/10 hover:border-white/30 transform hover:scale-110 hover:-translate-y-1 transition-all duration-300 overflow-hidden"
             >
               <span className="relative z-10 flex items-center gap-3">

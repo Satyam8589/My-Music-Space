@@ -9,12 +9,64 @@ import {
     updateSongModeAction
 } from "../../action/musicAction";
 
+const loadPlayHistory = () => {
+    if (typeof window === 'undefined') return [];
+    try {
+        const savedHistory = localStorage.getItem('playHistory');
+        return savedHistory ? JSON.parse(savedHistory) : [];
+    } catch (error) {
+        console.error('Error loading play history:', error);
+        return [];
+    }
+};
+
+const savePlayHistory = (history) => {
+    if (typeof window === 'undefined') return;
+    try {
+        localStorage.setItem('playHistory', JSON.stringify(history));
+    } catch (error) {
+        console.error('Error saving play history:', error);
+    }
+};
+
+const loadCurrentSong = () => {
+    if (typeof window === 'undefined') return null;
+    try {
+        const savedSong = localStorage.getItem('currentSong');
+        return savedSong ? JSON.parse(savedSong) : null;
+    } catch (error) {
+        console.error('Error loading current song:', error);
+        return null;
+    }
+};
+
+const saveCurrentSong = (song) => {
+    if (typeof window === 'undefined') return;
+    try {
+        if (song) {
+            localStorage.setItem('currentSong', JSON.stringify(song));
+        } else {
+            localStorage.removeItem('currentSong');
+        }
+    } catch (error) {
+        console.error('Error saving current song:', error);
+    }
+};
+
 const initialState = {
     moods: [],
     currentMood: null,
+    currentSong: loadCurrentSong(),
+    isPlaying: false,
+    durationSeconds: 0,
+    playedSeconds: 0,
+    isVideoMode: false,
+    volume: 0.8,
+    seekTo: null,
     isLoading: false,
     error: null,
-    message: ""
+    message: "",
+    playHistory: loadPlayHistory()
 };
 
 const musicReducer = createSlice({
@@ -33,6 +85,49 @@ const musicReducer = createSlice({
         },
         clearCurrentMood: (state) => {
             state.currentMood = null;
+        },
+        setCurrentSong: (state, action) => {
+            if (state.currentSong?.videoId !== action.payload.videoId) {
+                state.currentSong = action.payload;
+                state.isPlaying = true;
+                state.playedSeconds = 0;
+                state.durationSeconds = 0;
+                
+                const newHistory = [
+                    action.payload,
+                    ...state.playHistory.filter(song => song.videoId !== action.payload.videoId)
+                ].slice(0, 10);
+                state.playHistory = newHistory;
+                
+                savePlayHistory(newHistory);
+                saveCurrentSong(action.payload);
+            } else {
+                state.isPlaying = true;
+            }
+        },
+        setIsPlaying: (state, action) => {
+            state.isPlaying = action.payload;
+        },
+        togglePlay: (state) => {
+            state.isPlaying = !state.isPlaying;
+        },
+        setProgress: (state, action) => {
+            state.playedSeconds = action.payload.playedSeconds;
+            if (action.payload.durationSeconds) {
+                state.durationSeconds = action.payload.durationSeconds;
+            }
+        },
+        setIsVideoMode: (state, action) => {
+            state.isVideoMode = action.payload;
+        },
+        setVolume: (state, action) => {
+            state.volume = action.payload;
+        },
+        setSeekTo: (state, action) => {
+            state.seekTo = action.payload;
+        },
+        clearSeekTo: (state) => {
+            state.seekTo = null;
         }
     },
     extraReducers: (builder) => {
@@ -167,7 +262,15 @@ export const {
     clearError, 
     clearMessage,
     setCurrentMood,
-    clearCurrentMood
+    clearCurrentMood,
+    setCurrentSong,
+    setIsPlaying,
+    togglePlay,
+    setProgress,
+    setIsVideoMode,
+    setVolume,
+    setSeekTo,
+    clearSeekTo
 } = musicReducer.actions;
 
 export default musicReducer.reducer;

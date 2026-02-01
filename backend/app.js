@@ -1,6 +1,7 @@
 import express from "express";
 import cors from "cors";
 import morgan from "morgan";
+import cookieParser from "cookie-parser";
 import passport from "passport";
 import "./config/passport.js";
 import router from "./router/index.js";
@@ -16,12 +17,17 @@ const __dirname = path.dirname(fileURLToPath(import.meta.url));
 
 const app = express();
 
-app.use(cors({ origin: true, credentials: true }));
+app.use(cors({ 
+    origin: process.env.CORS_ORIGIN || "http://localhost:3001",
+    credentials: true 
+}));
+
 app.use(helmet({ contentSecurityPolicy: false, crossOriginEmbedderPolicy: false }));
 app.use(express.static(path.join(__dirname, "../frontend")));
 
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
+app.use(cookieParser());
 
 if (process.env.NODE_ENV === "production") {
     app.use(rateLimit({
@@ -31,9 +37,7 @@ if (process.env.NODE_ENV === "production") {
     }));
 }
 
-app.use(helmet());
 app.use(hpp());
-app.use(cors());
 
 if (process.env.NODE_ENV === "development") {
     app.use(morgan("dev"));

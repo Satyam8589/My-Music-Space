@@ -46,12 +46,32 @@ export const logoutAction = createAsyncThunk(
     "auth/logout",
     async (_, thunkAPI) => {
         try {
+            await clientServer.post("/auth/logout");
             if (typeof window !== "undefined") {
                 localStorage.removeItem("token");
             }
             return { message: "Logout successful" };
         } catch (error) {
             return thunkAPI.rejectWithValue(error.message);
+        }
+    }
+);
+
+export const googleAuthCallback = createAsyncThunk(
+    "auth/googleAuthCallback",
+    async (userData, thunkAPI) => {
+        try {
+            const response = await clientServer.post("/auth/google", {
+                token: userData.token,
+            });
+            if (response.data?.data?.accessToken) {
+                localStorage.setItem("token", response.data.data.accessToken);
+            }
+            return response.data.data;
+        } catch (error) {
+            return thunkAPI.rejectWithValue(
+                error.response?.data?.message || error.message
+            );
         }
     }
 );

@@ -1,9 +1,9 @@
 import { createSlice } from "@reduxjs/toolkit";
-import { loginAction, registerAction, logoutAction } from "../../action/authAction";
+import { loginAction, registerAction, logoutAction, googleAuthCallback } from "../../action/authAction";
 
 const initialState = {
     user: null,
-    isLoading: false,
+    isLoading: true, // Start in loading state to check token
     error: null,
     token: null,
     isAuthenticated: false,
@@ -15,6 +15,9 @@ const authReducer = createSlice({
     initialState,
     reducers: {
         reset: () => initialState,
+        setLoading: (state, action) => {
+            state.isLoading = action.payload;
+        },
         clearError: (state) => {
             state.error = null;
         },
@@ -23,6 +26,10 @@ const authReducer = createSlice({
         },
         setAuthenticated: (state, action) => {
             state.isAuthenticated = action.payload;
+        },
+        setToken: (state, action) => {
+            state.token = action.payload;
+            state.isAuthenticated = true;
         }
     },
     extraReducers: (builder) => {
@@ -83,14 +90,49 @@ const authReducer = createSlice({
             state.token = null;
             state.isAuthenticated = false;
         });
+
+        // Google Auth
+        builder.addCase(googleAuthCallback.pending, (state) => {
+            state.isLoading = true;
+            state.error = null;
+        });
+        builder.addCase(googleAuthCallback.fulfilled, (state, action) => {
+            state.isLoading = false;
+            state.user = action.payload.user;
+            state.token = action.payload.accessToken;
+            state.isAuthenticated = true;
+            state.error = null;
+            state.message = "Google authentication successful";
+        });
+        builder.addCase(googleAuthCallback.rejected, (state, action) => {
+            state.isLoading = false;
+            state.error = action.payload;
+            state.isAuthenticated = false;
+            state.user = null;
+            state.token = null;
+        });
+
+        // External User Profile Action
+        builder.addCase("user/getProfile/fulfilled", (state, action) => {
+            state.isLoading = false;
+            state.user = action.payload;
+            state.isAuthenticated = true;
+        });
+        builder.addCase("user/getProfile/rejected", (state) => {
+            state.isLoading = false;
+            state.isAuthenticated = false;
+            state.token = null;
+        });
     }
 });
 
 export const { 
     reset, 
+    setLoading,
     clearError, 
     clearMessage,
-    setAuthenticated
+    setAuthenticated,
+    setToken
 } = authReducer.actions;
 
 export default authReducer.reducer;

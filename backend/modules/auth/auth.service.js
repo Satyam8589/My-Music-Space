@@ -1,7 +1,27 @@
 import User from "../user/user.model.js";
 import { hashPassword, comparePassword } from "../../utils/hash.js";
-import { generateAccessToken } from "../../utils/jwt.js";
+import { generateAccessToken, generateRefreshToken } from "../../utils/jwt.js";
 import { ApiError } from "../../utils/ApiError.js";
+
+export const generateAccessAndRefreshTokens = async (userId) => {
+    try {
+        const user = await User.findById(userId);
+        const accessToken = generateAccessToken({ 
+            userId: user._id,
+            email: user.email
+        });
+        const refreshToken = generateRefreshToken({ 
+            userId: user._id
+        });
+
+        user.refreshToken = refreshToken;
+        await user.save({ validateBeforeSave: false });
+
+        return { accessToken, refreshToken };
+    } catch (error) {
+        throw new ApiError(500, "Something went wrong while generating tokens");
+    }
+};
 
 export const registerUser = async (userData) => {
     try {
@@ -41,10 +61,13 @@ export const registerUser = async (userData) => {
             throw new ApiError(500, "Failed to create user");
         }
 
-        const userObject = user.toObject();
-        const { password: _, ...userWithoutPassword } = userObject;
+        const { accessToken, refreshToken } = await generateAccessAndRefreshTokens(user._id);
 
-        return userWithoutPassword;
+        const userWithoutPassword = user.toObject();
+        delete userWithoutPassword.password;
+        delete userWithoutPassword.refreshToken;
+
+        return { user: userWithoutPassword, accessToken, refreshToken };
 
     } catch (error) {
         throw error;
@@ -54,18 +77,12 @@ export const registerUser = async (userData) => {
 export const loginUser = async (userData) => {
     try {
         let { email, password } = userData;
-
         email = email?.trim();
 
         if (!email || !password) {
             throw new ApiError(400, "All fields are required");
         }
 
-        const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-        if (!emailRegex.test(email)) {
-            throw new ApiError(400, "Invalid email format");
-        }
-        
         const user = await User.findOne({ email }).select("+password");
         
         if (!user) {
@@ -78,20 +95,18 @@ export const loginUser = async (userData) => {
             throw new ApiError(401, "Invalid credentials");
         }
         
-        const accessToken = generateAccessToken({ 
-            userId: user._id,
-            email: user.email
-        });
+        const { accessToken, refreshToken } = await generateAccessAndRefreshTokens(user._id);
         
-        const userObject = user.toObject();
-        const { password: _, ...userWithoutPassword } = userObject;
+        const userWithoutPassword = user.toObject();
+        delete userWithoutPassword.password;
+        delete userWithoutPassword.refreshToken;
         
         return { 
             accessToken, 
+            refreshToken,
             user: userWithoutPassword
         };
     } catch (error) {
         throw error;
     }
 };
-
