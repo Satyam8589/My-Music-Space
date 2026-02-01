@@ -12,7 +12,7 @@ export default function Register() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const dispatch = useDispatch();
-  const { isLoading, error, isAuthenticated } = useSelector((state) => state.auth);
+  const { isLoading, error, isAuthenticated, user } = useSelector((state) => state.auth);
   
   const [formData, setFormData] = useState({
     username: "",
@@ -31,15 +31,14 @@ export default function Register() {
       localStorage.setItem("token", token);
       dispatch(setToken(token));
       dispatch(getUserProfileAction());
-      router.push("/dashboard");
     }
-  }, [searchParams, dispatch, router]);
+  }, [searchParams, dispatch]);
 
   useEffect(() => {
-    if (isAuthenticated) {
+    if (isAuthenticated && user) {
       router.push("/dashboard");
     }
-  }, [isAuthenticated, router]);
+  }, [isAuthenticated, user, router]);
 
   useEffect(() => {
     const handleMouseMove = (e) => {

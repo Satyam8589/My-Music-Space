@@ -113,6 +113,10 @@ const authReducer = createSlice({
         });
 
         // External User Profile Action
+        builder.addCase("user/getProfile/pending", (state) => {
+            state.isLoading = true;
+            state.error = null;
+        });
         builder.addCase("user/getProfile/fulfilled", (state, action) => {
             state.isLoading = false;
             state.user = action.payload;

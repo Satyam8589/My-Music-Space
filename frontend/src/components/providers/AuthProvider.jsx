@@ -9,16 +9,26 @@ export default function AuthProvider({ children }) {
   const dispatch = useDispatch();
 
   useEffect(() => {
-    const token = localStorage.getItem('token');
-    if (token) {
-      // Set token in redux state
-      dispatch(setToken(token));
-      // Fetch user profile to verify token and get user data
-      dispatch(getUserProfileAction());
-    } else {
-      // No token found, stop loading
-      dispatch(setLoading(false));
-    }
+    const initAuth = async () => {
+      const token = localStorage.getItem('token');
+      if (token) {
+        // Set token in redux state
+        dispatch(setToken(token));
+        // Fetch user profile to verify token and get user data
+        try {
+          await dispatch(getUserProfileAction()).unwrap();
+        } catch (error) {
+          // If profile fetch fails, clear token and stop loading
+          localStorage.removeItem('token');
+          dispatch(setLoading(false));
+        }
+      } else {
+        // No token found, stop loading
+        dispatch(setLoading(false));
+      }
+    };
+
+    initAuth();
   }, [dispatch]);
 
   return <>{children}</>;

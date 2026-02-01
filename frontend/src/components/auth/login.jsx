@@ -12,7 +12,7 @@ export default function Login() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const dispatch = useDispatch();
-  const { isLoading, error, isAuthenticated } = useSelector((state) => state.auth);
+  const { isLoading, error, isAuthenticated, user } = useSelector((state) => state.auth);
   
   const [formData, setFormData] = useState({
     email: "",
@@ -27,15 +27,14 @@ export default function Login() {
       localStorage.setItem("token", token);
       dispatch(setToken(token));
       dispatch(getUserProfileAction());
-      router.push("/dashboard");
     }
-  }, [searchParams, dispatch, router]);
+  }, [searchParams, dispatch]);
 
   useEffect(() => {
-    if (isAuthenticated) {
+    if (isAuthenticated && user) {
       router.push("/dashboard");
     }
-  }, [isAuthenticated, router]);
+  }, [isAuthenticated, user, router]);
 
   useEffect(() => {
     const handleMouseMove = (e) => {
