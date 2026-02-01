@@ -7,12 +7,17 @@ import { registerAction, googleAuthCallback } from "@/config/redux/action/authAc
 import { setToken } from "@/config/redux/reducer/authReducer";
 import { getUserProfileAction } from "@/config/redux/action/userAction";
 import Link from "next/link";
+import FullPageLoader from "@/components/common/FullPageLoader";
 
 export default function Register() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const dispatch = useDispatch();
   const { isLoading, error, isAuthenticated, user } = useSelector((state) => state.auth);
+  
+  if (isLoading) {
+    return <FullPageLoader message="Creating your account..." />;
+  }
   
   const [formData, setFormData] = useState({
     username: "",
@@ -78,7 +83,14 @@ export default function Register() {
     }
 
     const { confirmPassword, ...registerData } = formData;
-    dispatch(registerAction(registerData));
+    try {
+      const result = await dispatch(registerAction(registerData)).unwrap();
+      if (result?.accessToken) {
+        await dispatch(getUserProfileAction()).unwrap();
+      }
+    } catch (err) {
+      console.error("Registration failed:", err);
+    }
   };
 
   const handleGoogleLogin = () => {

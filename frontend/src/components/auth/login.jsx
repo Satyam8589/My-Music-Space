@@ -7,12 +7,17 @@ import { loginAction, googleAuthCallback } from "@/config/redux/action/authActio
 import { setToken } from "@/config/redux/reducer/authReducer";
 import { getUserProfileAction } from "@/config/redux/action/userAction";
 import Link from "next/link";
+import FullPageLoader from "@/components/common/FullPageLoader";
 
 export default function Login() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const dispatch = useDispatch();
   const { isLoading, error, isAuthenticated, user } = useSelector((state) => state.auth);
+  
+  if (isLoading) {
+    return <FullPageLoader message="Signing you in..." />;
+  }
   
   const [formData, setFormData] = useState({
     email: "",

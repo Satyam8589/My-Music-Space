@@ -85,7 +85,7 @@ export const googleAuthCallback = asyncHandler(async (req, res) => {
 
     const { accessToken, refreshToken } = await generateAccessAndRefreshTokens(user._id);
     
-    let frontendURL = process.env.FRONTEND_URL || process.env.CORS_ORIGIN || "http://localhost:3000";
+    let frontendURL = process.env.FRONTEND_URL || process.env.CORS_ORIGIN || "http://localhost:3001";
     // Remove trailing slash if present
     if (frontendURL.endsWith('/')) {
         frontendURL = frontendURL.slice(0, -1);
